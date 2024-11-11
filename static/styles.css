@@ -1,0 +1,346 @@
+   body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #111, #222); /* Dark gradient background */
+    color: #E0E0E0; /* Light gray text for better contrast */
+}
+
+.container {
+    display: flex;
+    height: 100vh; /* Full viewport height */
+    flex-direction: column; /* Column layout for top bar and content */
+}
+
+.top-bar {
+    background: #2A2A2A; /* Darker top bar */
+    padding: 15px;
+    text-align: right; /* Centered text */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); /* Shadow for depth */
+}
+
+.main-content {
+    display: flex; /* Use flex to allow sidebar and content to sit next to each other */
+    flex: 1; /* Take remaining height */
+}
+
+.sidebar {
+    width: 250px; /* Fixed width for sidebar */
+    background: #333; /* Sidebar background color */
+    padding: 10px;
+    transition: width 0.3s; /* Smooth transition for width */
+    overflow-y: auto; /* Scrollbar for sidebar */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.7); /* Shadow for sidebar */
+    min-height: 600px;
+}
+
+.content {
+    flex: 1; /* Take the remaining space */
+    display: flex; /* Flex layout for content area */
+    background: #222; /* Dark background for content area */
+    padding: 10px;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.hidden {
+    display: none; /* Hide the sidebar */
+}
+
+.toggle-btn {
+    position: absolute; /* Fixed position for toggle button */
+    top: 15px;
+    left: 15px;
+    z-index: 1000; /* Ensure button is above other elements */
+    background: none; /* No background */
+    color: white;
+    border: none;
+    font-size: 24px; /* Increase font size for visibility */
+    cursor: pointer;
+    transition: transform 0.2s; /* Animation on hover */
+}
+
+.toggle-btn:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+.toggle-btn.open {
+    color: green; /* Green color for ☰ */
+}
+
+.toggle-btn.close {
+    color: rgb(26, 155, 242); /* Red color for ✖ */
+}
+
+.grid-item {
+    cursor: pointer;
+    margin: 5px 0; /* Space between items */
+    padding: 15px; /* Increased padding */
+    background: linear-gradient(145deg, #FF4081, #FF79B0); /* Gradient for items */
+    color: white;
+    text-align: center;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Shadow for depth */
+    transition: transform 0.2s, box-shadow 0.2s; /* Animation on hover */
+}
+
+.grid-item:hover {
+    transform: translateY(-3px); /* Lift effect on hover */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.6); /* Deeper shadow on hover */
+}
+
+iframe {
+    flex: 1; /* Take remaining height and width */
+    border: none; /* No border for iframe */
+    min-height: 2000px; /* Minimum height for iframe */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Shadow for depth */
+}
+/* Styling for buttons in top-bar */
+.top-bar {
+    background-color: #2c3e50; /* Darker color for the top bar */
+    display: flex;
+    justify-content: center;
+    padding: 1px;
+    border-bottom: 2px solid #34495e; /* Thin bottom border for effect */
+}
+
+.nav-btn {
+    background-color: #3498db; /* Light blue color */
+    color: white; /* White text */
+    border: none; /* Remove borders */
+    border-radius: 50px; /* Rounded buttons */
+    padding: 10px 25px; /* Padding for button size */
+    margin: 0 10px; /* Space between buttons */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 16px; /* Text size */
+    font-weight: bold; /* Bold font */
+    display: flex;
+    align-items: center; /* Align text and icon vertically */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+/* Hover effect for buttons */
+.nav-btn:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+}
+
+/* GitHub icon styling */
+.icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px; /* Spacing between icon and text */
+}    
+
+
+
+
+
+body {
+    margin: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    background: linear-gradient(135deg, #1E1E1E, #2D2D2D);
+    color: #D4D4D4;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Magical shimmer effect */
+.container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+        transparent 0%,
+        rgba(97, 175, 239, 0.03) 50%,
+        transparent 100%);
+    pointer-events: none;
+    animation: shimmer 3s infinite linear;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    position: relative;
+}
+
+.top-bar {
+    background: #252526;
+    padding: 8px 15px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #007ACC;
+    position: relative;
+    z-index: 100;
+}
+
+/* Glowing tab effect */
+.nav-btn {
+    background: linear-gradient(145deg, #2C2C2C, #363636);
+    color: #D4D4D4;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    margin: 0 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 122, 204, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-btn:hover {
+    background: linear-gradient(145deg, #363636, #404040);
+    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.4);
+    transform: translateY(-1px);
+}
+
+.nav-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    background: #1E1E1E;
+}
+
+.sidebar {
+    width: 250px;
+    background: #252526;
+    padding: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    border-right: 1px solid #333333;
+    min-height: 600px;
+}
+
+/* Custom scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #1E1E1E;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #4F4F4F;
+}
+
+.content {
+    flex: 1;
+    background: #1E1E1E;
+    padding: 20px;
+    position: relative;
+    overflow-y: auto; 
+}
+
+.toggle-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background: none;
+    color: #007ACC;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.toggle-btn:hover {
+    background: rgba(0, 122, 204, 0.1);
+    transform: scale(1.1);
+}
+
+.toggle-btn.open {
+    color: #3BBC56;
+}
+
+.toggle-btn.close {
+    color: #007ACC;
+}
+
+.grid-item {
+    cursor: pointer;
+    margin: 8px 0;
+    padding: 12px;
+    background: linear-gradient(145deg, #2C2C2C, #363636);
+    color: #D4D4D4;
+    text-align: left;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    border-left: 3px solid #007ACC;
+}
+
+.grid-item:hover {
+    transform: translateX(4px);
+    background: linear-gradient(145deg, #363636, #404040);
+    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+    border-left-color: #3BBC56;
+}
+
+iframe {
+    flex: 1;
+    border: none;
+    min-height: 2000px;
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    background: #1E1E1E;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.nav-btn:hover .icon {
+    opacity: 1;
+}
+

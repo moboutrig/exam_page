@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chepiont</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <h1>demo exam page</h1>
+        </div>
+
+        <div class="main-content">
+            <div id="sidebar" class="sidebar">
+                <div class="level-selector">
+                    <label for="level">Select Level:</label>
+                    <select id="level" onchange="displaySubjects()">
+                        <option value="1">Level 1</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                        <option value="4">Level 4</option>
+                        <option value="5">Level 5</option>
+                        <option value="6">Level 6</option>
+                        <option value="7">Level 7</option>
+                        <option value="8">Level 8</option>
+                        <option value="9">Level 9</option>
+                        <option value="10">Level 10</option>
+                    </select>
+                </div>
+
+                <div id="subject-container" class="subject-container"></div>
+            </div>
+
+            <button id="toggle-btn" class="toggle-btn" onclick="toggleSidebar()">❌</button>
+
+            <div class="content">
+                <div id="subject-content" class="iframe-content">
+                    <iframe id="content-frame" src="static/iframe.html" frameborder="0" width="100%" height="100%"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      const subjects = {
+        1: ["onlya", "onlyz"],
+        2: ["printalphabet", "printreversealphabet", "printdigits"],
+        3: ["strlen", "swap", "fishandchips", "countcharacter", "countalpha", "checknumber", "digitlen"],
+        4: ["atoi", "printcomb", "fromto", "capitalize", "itoa", "weareunique", "printrevcomb", "printmemory", "iscapitalized", "findprevprime", "thirdtimeisacharm"],
+        5: ["saveandmiss", "concatslice", "union", "inter", "fprime", "reversestrcap", "wdmatch"],
+        6: ["fifthandskip", "slice", "revconcatalternate", "notdecimal", "wordflip"],
+        7: ["split", "rostring", "printnbrbase", "splitwhitespaces"],
+        8: ["atoibase", "itoabase", "doop", "piglatin", "romannumbers", "options"],
+        9: ["rpncalc", "brackets", "sortedlistmerge"],
+        10: ["btreedeletenode", "grouping", "brainfuck"]
+        };
+
+
+
+        function displaySubjects() {
+            const level = document.getElementById("level").value;
+            const subjectContainer = document.getElementById("subject-container");
+            subjectContainer.innerHTML = '';
+
+            if (level) {
+                subjects[level].forEach((subject) => {
+                    const subjectDiv = document.createElement("div");
+                    subjectDiv.classList.add("grid-item");
+                    subjectDiv.textContent = subject;
+                    subjectDiv.onclick = () => {
+                        localStorage.setItem('selectedSubject', subject); // Store selected subject
+                        sendToIframe(subject); // Send subject to iframe
+                    };
+                    subjectContainer.appendChild(subjectDiv);
+                });
+            }
+        }
+
+        function sendToIframe(subject) {
+            const iframeWindow = document.getElementById("content-frame").contentWindow;
+            iframeWindow.postMessage({ subject }, "*");
+        }
+  
+        function sendToIframe(subject) {
+            // Send the subject as a message to the iframe
+            const iframeWindow = document.getElementById("content-frame").contentWindow;
+            iframeWindow.postMessage({ subject }, "*");
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const toggleBtn = document.getElementById("toggle-btn");
+            const content = document.querySelector(".content");
+
+            sidebar.classList.toggle("hidden");
+
+            if (sidebar.classList.contains("hidden")) {
+                toggleBtn.classList.remove("close");
+                toggleBtn.classList.add("open");
+                toggleBtn.textContent = "☰ ";
+                content.style.width = "100%";
+            } else {
+                toggleBtn.classList.remove("open");
+                toggleBtn.classList.add("close");
+                toggleBtn.textContent = "❌";
+                content.style.width = "80%";
+            }
+        }
+
+        window.onload = displaySubjects;
+    </script>
+</body>
+</html>
+
+
+// "onlya", "onlyz"
+// "printalphabet", "printreversealphabet", "printdigits"
+// "strlen", "swap", "fishandchips", "countcharacter", "countalpha", "checknumber", "digitlen"
+// "atoi", "printcomb", "fromto", "capitalize", "itoa", "weareunique", "printrevcomb", "printmemory", "iscapitalized", "findprevprime", "thirdtimeisacharm"
+// "saveandmiss", "concatslice", "union", "inter", "fprime", "reversestrcap", "wdmatch"
+// "fifthandskip", "slice", "revconcatalternate", "notdecimal", "wordflip"
+// "split", "rostring", "printnbrbase", "splitwhitespaces"
+// "atoibase", "itoabase", "doop", "piglatin", "romannumbers", "options"
+// "rpncalc", "brackets", "sortedlistmerge"
+// "btreedeletenode", "grouping", "brainfuck"

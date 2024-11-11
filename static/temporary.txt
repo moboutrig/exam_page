@@ -1,0 +1,59 @@
+package main
+
+import (
+	"os"
+	"github.com/01-edu/z01"
+	"strconv"
+)
+
+func validateOperator(test string) bool {
+	op := []string{"+", "-", "*", "/", "%"}
+	for _, res:= range op {
+		if res == test {
+			return true
+		}
+	}
+	return false
+}
+
+func main(){
+	args := os.Args[1:]
+	if len(args) > 3 || len(args) < 3 {
+		fmt.Print()
+	}else{
+		if validateOperator(args[1]) == false {
+			PrintStr(0)
+		}else{
+			premier, _ := strconv.Atoi(args[0])
+			second, _ := strconv.Atoi(args[2])
+			
+			if args[1] == "%" && second == 0 {
+				fmt.Print("No Modulo by 0\n")
+			}else if args[1] == "/" && second == 0 {
+				fmt.Print("No division by 0\n")
+			}else if args[1] == "+" {
+				PrintStr(premier+second)
+			}else if args[1] == "-" {
+				PrintStr(premier-second)
+			}else if args[1] == "*" {
+				PrintStr(premier * second)
+			}else if args[1] == "/" {
+				PrintStr(premier/second)
+			}else{
+				PrintStr(premier%second)
+			}
+
+		}
+	}
+
+}
+
+
+func PrintStr(s string) {
+	for _, letter := range s{
+		z01.PrintRune(letter)
+	}
+}
+
+
+

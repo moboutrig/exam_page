@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Frame</title>
+    <style>
+        /* Reset default margins and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background-color: #121212; /* Deep black background for contrast */
+            color: #E0E0E0; /* Light grey for text */
+        }
+
+        /* Main container takes full viewport */
+        .main-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle, #1e1e2e 0%, #121212 100%);
+        }
+
+        /* Labels container */
+        .labels {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: #1e1e2e; /* Dark background for labels */
+            border-bottom: 2px solid #444; /* Subtle bottom border */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Label styling */
+        .label {
+            padding: 12px 25px;
+            cursor: pointer;
+            border-radius: 8px;
+            background-color: #3a3a3a;
+            color: #E0E0E0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent; /* Transparent border for smoother transition */
+        }
+
+        /* Active label styling */
+        .label.active {
+            background-color: #007bff; /* Active label color */
+            color: #fff; /* Active text color */
+            border: 2px solid #0056b3; /* Active border color */
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Label hover effect */
+        .label:hover {
+            background-color: #555; /* Background on hover */
+            color: #fff; /* Text color on hover */
+            border: 2px solid #007bff; /* Border on hover */
+        }
+
+        /* Content containers */
+        .content-wrapper {
+            flex: 1;
+            position: relative;
+            padding: 20px;
+            background: #1e1e2e; /* Darker background for content area */
+        }
+
+        /* Iframe styling */
+        .iframe-container {
+            display: none; /* Hide all iframes by default */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .iframe-container.active {
+            display: block; /* Show active iframe */
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Content styling */
+        h2 {
+            margin-bottom: 20px;
+            color: #FFAB00; /* Bright accent color */
+        }
+
+        .exercise-details, .answer-content {
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="labels">
+            <div id="label1" class="label active">Subject 🤷❓</div>
+            <div id="label2" class="label">👨‍💻 Code Editor</div>
+            <div id="label3" class="label">💡 Solution</div>
+            <div id="label4" class="label">🎥 Video</div>
+        </div>
+
+        <div class="content-wrapper">
+            <iframe id="iframe1" class="iframe-container active" src="subject.html"></iframe>
+            <iframe id="iframe2" class="iframe-container" src="editor.html"></iframe>
+            <iframe id="iframe3" class="iframe-container" src="solution.html"></iframe>
+            <iframe id="iframe4" class="iframe-container" src="youtube-video-player-clone/index.html"></iframe>
+        </div>
+    </div>
+
+    <script>
+        let currentSubject = "";
+
+// Function to send subject to iframes
+function sendToIframe1(subject) {
+    document.querySelectorAll('.iframe-container').forEach((iframe) => {
+        if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ currentSubject: subject }, "*");
+        }
+    });
+}
+
+function updateSubject(newSubject) {
+    currentSubject = newSubject;
+    localStorage.setItem('selectedSubject', currentSubject);
+    sendToIframe1(currentSubject);
+}
+
+// Listen for messages from the parent window
+window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) {
+        console.warn('Message from unknown origin:', event.origin);
+        return;
+    }
+    if (event.data && event.data.subject) {
+        updateSubject(event.data.subject);
+    }
+});
+
+// Restore subject and active tab on page load
+window.onload = function() {
+    const storedSubject = localStorage.getItem('selectedSubject');
+    const activeTabIndex = localStorage.getItem('activeTabIndex'); 
+
+    // Hide all iframes initially
+    document.querySelectorAll('.iframe-container').forEach(iframe => iframe.classList.remove('active'));
+
+    if (storedSubject) {
+        currentSubject = storedSubject;
+        sendToIframe1(currentSubject);
+    }
+
+    if (activeTabIndex !== null) {
+        // Restore the active tab and iframe
+        document.querySelectorAll('.label').forEach((label, index) => {
+            if (index === parseInt(activeTabIndex)) {
+                label.classList.add('active');
+                document.getElementById(`iframe${index + 1}`).classList.add('active');
+            }
+        });
+    }
+};
+
+// Tab switching logic
+document.querySelectorAll('.label').forEach((label, index) => {
+    label.addEventListener('click', () => {
+        // Remove 'active' class from all labels and iframes
+        document.querySelectorAll('.label').forEach(lbl => lbl.classList.remove('active'));
+        document.querySelectorAll('.iframe-container').forEach(iframe => iframe.classList.remove('active'));
+
+        // Add 'active' class to clicked label and corresponding iframe
+        label.classList.add('active');
+        document.getElementById(`iframe${index + 1}`).classList.add('active');
+
+        // Store the current tab index
+        localStorage.setItem('activeTabIndex', index);
+
+        // Store and send the current subject to iframes
+        localStorage.setItem('selectedSubject', currentSubject);
+        sendToIframe1(currentSubject);
+    });
+});
+
+    </script>
+</body>
+</html>

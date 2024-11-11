@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- CodeMirror CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css" rel="stylesheet">
+    <!-- XTerm.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css" rel="stylesheet">
+    
+    <style>
+ .editor-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            display: flex;
+            gap: 20px;
+        }
+
+        .editor-section {
+            flex: 2;
+        }
+
+        .terminal-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .editor {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .terminal-container {
+            background: #282a36;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #1e1f29;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 10px;
+        }
+
+        .terminal-title {
+            color: #f8f8f2;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+        }
+
+        .terminal-close { background: #ff5555; }
+        .terminal-minimize { background: #f1fa8c; }
+        .terminal-maximize { background: #50fa7b; }
+
+        .editor-header {
+            background: #282a36;
+            padding: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .CodeMirror-selected {
+            background-color: #4e9fd2 !important; /* A distinct blue for selection */
+        }
+
+        /* Ensure terminal selection is distinguishable */
+        .xterm .xterm-selection {
+            background-color: #4e9fd2 !important; /* Matching blue for terminal selection */
+        }
+
+        .tab-label {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-label:hover {
+            background: #44475a;
+        }
+
+        .tab-label.active {
+            background: #44475a;
+            color: #50fa7b;
+        }
+
+        .file-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .editor-wrapper {
+            height: 400px;
+            display: none;
+        }
+
+        .editor-wrapper.active {
+            display: block;
+        }
+
+        .CodeMirror {
+            height: 100%;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .terminal-content {
+            background: #282a36;
+            border-radius: 0 0 8px 8px;
+            padding: 10px;
+            height: 360px;
+            overflow: hidden;
+        }
+
+        .editor-footer {
+            background: #282a36;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-run {
+            background: #50fa7b;
+            color: #282a36;
+        }
+
+        .btn-run:hover {
+            background: #40ca6b;
+        }
+
+        .btn-push {
+            background: #bd93f9;
+            color: white;
+        }
+
+        .btn-push:hover {
+            background: #9d73f9;
+        }
+
+        .btn-clear {
+            background: #ff5555;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #ff3333;
+        }
+
+        .args-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #44475a;
+            color: #f8f8f2;
+        }
+
+        .args-input::placeholder {
+            color: #6272a4;
+        }
+
+
+ .terminal-content {
+    background: #282a36;
+    border-radius: 0 0 8px 8px;
+    padding: 10px;
+    height: 360px;
+    overflow-x: auto; /* Enables horizontal scroll */
+    overflow-y: auto; /* Enables vertical scroll */
+    white-space: pre-wrap; /* Preserve line breaks */
+    word-wrap: break-word; /* Preserve line breaks */
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <div class="editor-section">
+            <div class="editor">
+                <div class="editor-header">
+                    <div class="tab-label active">
+                        <svg class="file-icon" viewBox="0 0 16 16">
+                            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+                        </svg>
+                        <span id="currentSubject">Loading...</span>/main.go
+                    </div>
+                </div>
+                <div id="main-editor" class="editor-wrapper active"></div>
+                
+                <!-- Form for submitting the code -->
+                                <!-- Form for submitting the code -->
+                                <form id="codeForm">
+                                    <div class="editor-footer">
+                                        <input type="text" id="args" class="args-input" placeholder="Enter arguments here...">
+                                        
+                                        <!-- Run Button -->
+                                        <button type="submit" class="btn btn-run" onclick="runCode(event)">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                                <path d="M4 2v12l10-6L4 2z"/>
+                                            </svg>
+                                            run 
+                                        </button>
+                                        
+                                        <!-- Push & Test Button -->
+                                        <button class="btn btn-push" onclick="testCode(event)">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                                <path d="M8 2.5l4 4h-3v7H7v-7H4l4-4z"/>
+                                            </svg>
+                                            Push & test 
+                                        </button>
+                                    </div>
+                                </form>   
+            </div>
+        </div>
+        
+        
+        <div class="terminal-section">
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <div class="terminal-title">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="color: #f8f8f2">
+                            <path d="M6 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3A.5.5 0 0 1 6 9zM3.854 4.146a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2z"/>
+                        </svg>
+                        Output Terminal
+                    </div>
+                    <div class="terminal-controls">
+                        <div class="terminal-button terminal-minimize"></div>
+                        <div class="terminal-button terminal-maximize"></div>
+                        <div class="terminal-button terminal-close"></div>
+                    </div>
+                </div>
+                <div id="terminal" class="terminal-content"></div>
+                <div class="editor-footer">
+                    <button class="btn btn-clear" onclick="clearTerminal()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/go/go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+
+    <script>
+        // Initialize Terminal
+        const term = new Terminal({
+            theme: {
+                background: '#282a36',
+                foreground: '#f8f8f2',
+                cursor: '#f8f8f2',
+                selection: '#44475a',
+                black: '#21222C',
+                red: '#FF5555',
+                green: '#50FA7B',
+                yellow: '#F1FA8C',
+                blue: '#BD93F9',
+                magenta: '#FF79C6',
+                cyan: '#8BE9FD',
+                white: '#F8F8F2',
+            },
+            fontFamily: 'Consolas, Monaco, monospace',
+            fontSize: 14,
+            lineHeight: 1.5,
+            cursorBlink: true,
+            convertEol: true,
+        });
+
+        term.open(document.getElementById('terminal'));
+        term.writeln('\x1b[32m$ \x1b[37mGo Terminal Ready...\x1b[0m');
+
+        // Initialize CodeMirror instances
+        const mainEditor = CodeMirror(document.getElementById('main-editor'), {
+            value: localStorage.getItem('mainEditorContent') || `package main
+
+import (
+    "piscine"
+    // other allowed imports
+    )
+
+func main() {
+    
+}`,
+            mode: "go",
+            theme: "dracula",
+            lineNumbers: true,
+            indentUnit: 4,
+            smartIndent: true,
+            tabSize: 4,
+            indentWithTabs: true,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            autofocus: true
+        });
+
+    
+        // Function to switch between editors
+       
+        // Save editor content to localStorage on change
+        mainEditor.on('change', function () {
+            saveEditorContent(mainEditor, 'mainEditorContent');
+        });
+
+ 
+   // Run Code functionality
+async function runCode(e) {
+    e.preventDefault();
+    const mainCode = mainEditor.getValue();
+    const args = document.getElementById('args').value;
+    
+    const response = await fetch('/compile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ main: mainCode , args: args })
+    });
+
+    const result = await response.text();
+    term.writeln(result);
+}
+
+
+
+// Corrected testCode function
+async function testCode(e) {
+    e.preventDefault();
+
+    const mainCode = mainEditor.getValue();
+    const currentSubject = document.getElementById('currentSubject').textContent; // Corrected to textContent
+
+    const response = await fetch('/test', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            subject: currentSubject,
+            main : mainCode
+        })
+    });
+
+    const result = await response.text();
+    term.writeln(result);
+}
+
+
+
+        // Simulate push function for code execution
+        function simulatePush() {
+            // Example of pushing the content to the Go backend or simulation logic
+        }
+
+        // Clear terminal output
+        function clearTerminal() {
+            term.clear();
+        }
+
+        const subjectElement = document.getElementById('currentSubject');
+
+        // Function to update the subject text and localStorage
+        const updateSubject = (subject) => {
+            subjectElement.textContent = subject ;
+            localStorage.setItem('selectedSubject', subject);
+            loadEditorContent(mainEditor, `${subject}_mainEditorContent`);
+        }
+
+        // Try to get the saved subject from localStorage or set default
+        const savedSubject = localStorage.getItem('selectedSubject') ;
+        updateSubject(savedSubject);
+
+        // Listen for message events to update the subject
+        window.addEventListener("message", (event) => {
+            const currentSubject = event.data?.currentSubject;
+            if (currentSubject) {
+                updateSubject(currentSubject);
+            }
+        });
+
+        // Function to save editor content to localStorage
+        function saveEditorContent(editor, storageKey) {
+            const currentSubject = localStorage.getItem('selectedSubject') || 'atoi';
+            localStorage.setItem(`${currentSubject}_${storageKey}`, editor.getValue());
+        }
+
+        // Function to load editor content from localStorage
+        function loadEditorContent(editor, storageKey) {
+            const savedContent = localStorage.getItem(storageKey);
+            if (savedContent) {
+                editor.setValue(savedContent);
+            } else {
+                editor.setValue('');
+            }
+        }
+    </script>
+</body>
+
+</html>
+
+

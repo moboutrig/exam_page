@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub-style Markdown Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+    <style>
+        /* GitHub-like styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #24292e;
+        }
+
+        #content {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        h1 {
+            font-size: 2em;
+            padding-bottom: .3em;
+            border-bottom: 1px solid #eaecef;
+        }
+
+        code {
+            padding: .2em .4em;
+            font-size: 85%;
+            background-color: rgba(27,31,35,.05);
+            border-radius: 6px;
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+        }
+
+        pre code {
+            padding: 16px;
+            display: block;
+            overflow-x: auto;
+            background-color: #f6f8fa;
+        }
+
+        blockquote {
+            padding: 0 1em;
+            color: #6a737d;
+            border-left: .25em solid #dfe2e5;
+            margin: 0;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        .error {
+            color: #cb2431;
+            padding: 1em;
+            border: 1px solid #cb2431;
+            border-radius: 6px;
+            margin: 1em 0;
+        }
+        #allowedfunc {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        #allowedfunc:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .allowed-function {
+            padding: 10px;
+            background-color: #e7f3fe;
+            border-left: 4px solid #2196F3;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        p {
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+    </style>
+<body>
+    <h3>Allowed Functions:</h3>
+    <div id="allowedfunc">
+        <div id="functions-list">
+            <!-- Allowed functions will be dynamically inserted here -->
+        </div>
+    </div>
+    <div id="content"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        let currentSubject = "";
+
+        // Function to fetch and render README.md
+        async function loadMarkdown(subject) {
+            try {
+                if (!subject) {
+                    throw new Error('No subject selected');
+                }
+
+                const response = await fetch(`subjects/${subject}/README.md`);
+                if (!response.ok) {
+                    throw new Error(`Failed to load README.md for ${subject}`);
+                }
+
+                const text = await response.text();
+
+                // Configure marked options for GitHub-flavored markdown
+                marked.setOptions({
+                    gfm: true,
+                    breaks: true,
+                    headerIds: true,
+                    mangle: false
+                });
+
+                // Render the markdown content
+                document.getElementById('content').innerHTML = marked.parse(text);
+
+                // Fetch and display allowed functions
+                await displayAllowedFunctions(subject);
+            } catch (error) {
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        <strong>Error loading README.md:</strong><br>
+                        ${error.message}<br>
+                        Please make sure a subject is selected and the corresponding README.md file exists.
+                    </div>`;
+            }
+        }
+
+        // Function to fetch and display allowed functions
+        async function displayAllowedFunctions(subject) {
+    try {
+        let allowedFunctions = localStorage.getItem(`allowedFunctions_${subject}`);
+        
+        if (!allowedFunctions) {
+            // Fetch the JSON data
+            const response = await fetch('checkpoint.json');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch checkpoint.json: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Fetched data:', data); // Debugging line
+
+            const subjectEntry = data['checkpoint-01'][subject];
+            console.log('Subject entry:', subjectEntry); // Debugging line
+            
+            if (subjectEntry && subjectEntry.attrs && subjectEntry.attrs.allowedFunctions) {
+                allowedFunctions = subjectEntry.attrs.allowedFunctions.join('<br>');
+                localStorage.setItem(`allowedFunctions_${subject}`, allowedFunctions);
+            } else {
+                throw new Error(`Allowed functions not found for subject: ${subject}`);
+            }
+        }
+
+        // Display the allowed functions
+        const allowedFuncsElement = document.getElementById('allowedfunc');
+        allowedFuncsElement.innerHTML = allowedFunctions;
+    } catch (error) {
+        console.error('Error fetching allowed functions:', error);
+        document.getElementById('allowedfunc').innerHTML = 'Error loading allowed functions.';
+    }
+}
+
+        // Listen for messages from the parent window
+        window.addEventListener("message", (event) => {
+            if (event.data && event.data.currentSubject) {
+                currentSubject = event.data.currentSubject;
+                localStorage.setItem('selectedSubject', currentSubject);
+                loadMarkdown(currentSubject);
+            }
+        });
+
+        // Initial load if there's a stored subject
+        window.onload = function() {
+            const storedSubject = localStorage.getItem('selectedSubject');
+            if (storedSubject) {
+                currentSubject = storedSubject;
+                loadMarkdown(currentSubject);
+            } else {
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        <strong>Welcome!</strong><br>
+                        Please select a subject to view its content.
+                    </div>`;
+            }
+        };
+    </script>
+</body>
+</html>
+
+
