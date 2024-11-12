@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css" rel="stylesheet">
     
     <style>
-        .editor-container {
+ .editor-container {
             max-width: 1200px;
             margin: 20px auto;
             font-family: 'Consolas', 'Monaco', monospace;
@@ -84,13 +84,13 @@
         }
 
         .CodeMirror-selected {
-        background-color: #4e9fd2 !important; /* A distinct blue for selection */
-    }
+            background-color: #4e9fd2 !important; /* A distinct blue for selection */
+        }
 
-    /* Ensure terminal selection is distinguishable */
-    .xterm .xterm-selection {
-        background-color: #4e9fd2 !important; /* Matching blue for terminal selection */
-    }
+        /* Ensure terminal selection is distinguishable */
+        .xterm .xterm-selection {
+            background-color: #4e9fd2 !important; /* Matching blue for terminal selection */
+        }
 
         .tab-label {
             padding: 8px 16px;
@@ -190,6 +190,37 @@
         .btn-clear:hover {
             background: #ff3333;
         }
+
+        .args-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #44475a;
+            color: #f8f8f2;
+        }
+
+        .args-input::placeholder {
+            color: #6272a4;
+        }
+
+
+ .terminal-content {
+    background: #282a36;
+    border-radius: 0 0 8px 8px;
+    padding: 10px;
+    height: 360px;
+    overflow-x: auto; /* Enables horizontal scroll */
+    overflow-y: auto; /* Enables vertical scroll */
+    white-space: pre-wrap; /* Preserve line breaks */
+    word-wrap: break-word; /* Preserve line breaks */
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
     </style>
 </head>
 <body>
@@ -207,24 +238,31 @@
                 <div id="main-editor" class="editor-wrapper active"></div>
                 
                 <!-- Form for submitting the code -->
-                <form id="codeForm">
-                    <div class="editor-footer">
-                        <button type="submit" class="btn btn-run">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M4 2v12l10-6L4 2z"/>
-                            </svg>
-                            Submit
-                        </button>
-                        <button class="btn btn-push" onclick="simulatePush()">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 2.5l4 4h-3v7H7v-7H4l4-4z"/>
-                            </svg>
-                            Push
-                        </button>
-                    </div>
-                </form>
+                                <!-- Form for submitting the code -->
+                                <form id="codeForm">
+                                    <div class="editor-footer">
+                                        <input type="text" id="args" class="args-input" placeholder="Enter arguments here...">
+                                        
+                                        <!-- Run Button -->
+                                        <button type="submit" class="btn btn-run" onclick="runCode(event)">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                                <path d="M4 2v12l10-6L4 2z"/>
+                                            </svg>
+                                            run 
+                                        </button>
+                                        
+                                        <!-- Push & Test Button -->
+                                        <button class="btn btn-push" onclick="testCode(event)">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                                <path d="M8 2.5l4 4h-3v7H7v-7H4l4-4z"/>
+                                            </svg>
+                                            Push & test 
+                                        </button>
+                                    </div>
+                                </form>   
             </div>
         </div>
+        
         
         <div class="terminal-section">
             <div class="terminal-container">
@@ -320,19 +358,49 @@ func main() {
             saveEditorContent(mainEditor, 'mainEditorContent');
         });
 
-        document.getElementById('codeForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const mainCode = mainEditor.getValue();
-            const response = await fetch('/compile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({ main: mainCode })
-            });
-            const result = await response.text();
-            document.getElementById('terminal').textContent = result;
-        };
+ 
+   // Run Code functionality
+async function runCode(e) {
+    e.preventDefault();
+    const mainCode = mainEditor.getValue();
+    const args = document.getElementById('args').value;
+    
+    const response = await fetch('/compile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ main: mainCode , args: args })
+    });
+
+    const result = await response.text();
+    term.writeln(result);
+}
+
+
+
+// Corrected testCode function
+async function testCode(e) {
+    e.preventDefault();
+
+    const mainCode = mainEditor.getValue();
+    const currentSubject = document.getElementById('currentSubject').textContent; // Corrected to textContent
+
+    const response = await fetch('/test', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            subject: currentSubject,
+            main : mainCode
+        })
+    });
+
+    const result = await response.text();
+    term.writeln(result);
+}
+
 
 
         // Simulate push function for code execution
