@@ -17,8 +17,8 @@
             height: 100%;
             overflow: hidden;
             font-family: 'Arial', sans-serif;
-            background-color: #121212; /* Deep black background for contrast */
-            color: #E0E0E0; /* Light grey for text */
+            background-color: #121212;
+            color: #E0E0E0;
         }
 
         /* Main container takes full viewport */
@@ -35,15 +35,15 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            padding: 15px;
-            background: #1e1e2e; /* Dark background for labels */
-            border-bottom: 2px solid #444; /* Subtle bottom border */
+            padding: 10px;
+            background: #1e1e2e;
+            border-bottom: 2px solid #444;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         /* Label styling */
         .label {
-            padding: 12px 25px;
+            padding: 8px 15px;
             cursor: pointer;
             border-radius: 8px;
             background-color: #3a3a3a;
@@ -51,56 +51,63 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            border: 2px solid transparent; /* Transparent border for smoother transition */
+            border: 2px solid transparent;
+            font-size: 0.9em;
         }
 
         /* Active label styling */
         .label.active {
-            background-color: #007bff; /* Active label color */
-            color: #fff; /* Active text color */
-            border: 2px solid #0056b3; /* Active border color */
+            background-color: #007bff;
+            color: #fff;
+            border: 2px solid #0056b3;
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5);
         }
 
         /* Label hover effect */
         .label:hover {
-            background-color: #555; /* Background on hover */
-            color: #fff; /* Text color on hover */
-            border: 2px solid #007bff; /* Border on hover */
+            background-color: #555;
+            color: #fff;
+            border: 2px solid #007bff;
         }
 
         /* Content containers */
         .content-wrapper {
             flex: 1;
             position: relative;
-            padding: 20px;
-            background: #1e1e2e; /* Darker background for content area */
+            background: #1e1e2e;
+            overflow: hidden;
         }
 
         /* Iframe styling */
         .iframe-container {
-            display: none; /* Hide all iframes by default */
+            display: none;
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 20px;
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .iframe-container.active {
-            display: block; /* Show active iframe */
+            display: block;
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Iframe takes full size of its container */
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         /* Content styling */
         h2 {
             margin-bottom: 20px;
-            color: #FFAB00; /* Bright accent color */
+            color: #FFAB00;
         }
 
         .exercise-details, .answer-content {
@@ -115,93 +122,89 @@
 <body>
     <div class="main-container">
         <div class="labels">
-            <div id="label1" class="label active">Subject 🤷❓</div>
-            <div id="label2" class="label">👨‍💻 Code Editor</div>
-            <div id="label3" class="label">💡 Solution</div>
-            <div id="label4" class="label">🎥 Video</div>
+            <div id="label1" class="label active">🤷❓</div>
+            <div id="label2" class="label">👨‍💻</div>
+            <div id="label3" class="label">💡</div>
+            <div id="label4" class="label">🎥</div>
         </div>
 
         <div class="content-wrapper">
-            <iframe id="iframe1" class="iframe-container active" src="subject.html"></iframe>
-            <iframe id="iframe2" class="iframe-container" src="editor.html"></iframe>
-            <iframe id="iframe3" class="iframe-container" src="solution.html"></iframe>
-            <iframe id="iframe4" class="iframe-container" src="youtube-video-player-clone/index.html"></iframe>
+            <div id="iframe1" class="iframe-container active">
+                <iframe src="subject.html" title="Subject Content" width="100%" height="100%"></iframe>
+            </div>
+            <div id="iframe2" class="iframe-container">
+                <iframe src="editor.html" title="Code Editor" width="100%" height="100%"></iframe>
+            </div>
+            <div id="iframe3" class="iframe-container">
+                <iframe src="solution.html" title="Solution" width="100%" height="100%"></iframe>
+            </div>
+            <div id="iframe4" class="iframe-container">
+                <iframe src="youtube-video-player-clone/index.html" title="Video Player" width="100%" height="100%"></iframe>
+            </div>
         </div>
     </div>
 
     <script>
         let currentSubject = "";
 
-// Function to send subject to iframes
-function sendToIframe1(subject) {
-    document.querySelectorAll('.iframe-container').forEach((iframe) => {
-        if (iframe.contentWindow) {
-            iframe.contentWindow.postMessage({ currentSubject: subject }, "*");
+        function sendToIframe1(subject) {
+            document.querySelectorAll('.iframe-container iframe').forEach((iframe) => {
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({ currentSubject: subject }, "*");
+                }
+            });
         }
-    });
-}
 
-function updateSubject(newSubject) {
-    currentSubject = newSubject;
-    localStorage.setItem('selectedSubject', currentSubject);
-    sendToIframe1(currentSubject);
-}
+        function updateSubject(newSubject) {
+            currentSubject = newSubject;
+            localStorage.setItem('selectedSubject', currentSubject);
+            sendToIframe1(currentSubject);
+        }
 
-// Listen for messages from the parent window
-window.addEventListener("message", (event) => {
-    if (event.origin !== window.location.origin) {
-        console.warn('Message from unknown origin:', event.origin);
-        return;
-    }
-    if (event.data && event.data.subject) {
-        updateSubject(event.data.subject);
-    }
-});
-
-// Restore subject and active tab on page load
-window.onload = function() {
-    const storedSubject = localStorage.getItem('selectedSubject');
-    const activeTabIndex = localStorage.getItem('activeTabIndex'); 
-
-    // Hide all iframes initially
-    document.querySelectorAll('.iframe-container').forEach(iframe => iframe.classList.remove('active'));
-
-    if (storedSubject) {
-        currentSubject = storedSubject;
-        sendToIframe1(currentSubject);
-    }
-
-    if (activeTabIndex !== null) {
-        // Restore the active tab and iframe
-        document.querySelectorAll('.label').forEach((label, index) => {
-            if (index === parseInt(activeTabIndex)) {
-                label.classList.add('active');
-                document.getElementById(`iframe${index + 1}`).classList.add('active');
+        window.addEventListener("message", (event) => {
+            if (event.origin !== window.location.origin) {
+                console.warn('Message from unknown origin:', event.origin);
+                return;
+            }
+            if (event.data && event.data.subject) {
+                updateSubject(event.data.subject);
             }
         });
-    }
-};
 
-// Tab switching logic
-document.querySelectorAll('.label').forEach((label, index) => {
-    label.addEventListener('click', () => {
-        // Remove 'active' class from all labels and iframes
-        document.querySelectorAll('.label').forEach(lbl => lbl.classList.remove('active'));
-        document.querySelectorAll('.iframe-container').forEach(iframe => iframe.classList.remove('active'));
+        window.onload = function() {
+            const storedSubject = localStorage.getItem('selectedSubject');
+            const activeTabIndex = localStorage.getItem('activeTabIndex'); 
 
-        // Add 'active' class to clicked label and corresponding iframe
-        label.classList.add('active');
-        document.getElementById(`iframe${index + 1}`).classList.add('active');
+            document.querySelectorAll('.iframe-container').forEach(iframe => iframe.classList.remove('active'));
 
-        // Store the current tab index
-        localStorage.setItem('activeTabIndex', index);
+            if (storedSubject) {
+                currentSubject = storedSubject;
+                sendToIframe1(currentSubject);
+            }
 
-        // Store and send the current subject to iframes
-        localStorage.setItem('selectedSubject', currentSubject);
-        sendToIframe1(currentSubject);
-    });
-});
+            if (activeTabIndex !== null) {
+                document.querySelectorAll('.label').forEach((label, index) => {
+                    if (index === parseInt(activeTabIndex)) {
+                        label.classList.add('active');
+                        document.getElementById(`iframe${index + 1}`).classList.add('active');
+                    }
+                });
+            }
+        };
 
+        document.querySelectorAll('.label').forEach((label, index) => {
+            label.addEventListener('click', () => {
+                document.querySelectorAll('.label').forEach(lbl => lbl.classList.remove('active'));
+                document.querySelectorAll('.iframe-container').forEach(iframe => iframe.classList.remove('active'));
+
+                label.classList.add('active');
+                document.getElementById(`iframe${index + 1}`).classList.add('active');
+
+                localStorage.setItem('activeTabIndex', index);
+                localStorage.setItem('selectedSubject', currentSubject);
+                sendToIframe1(currentSubject);
+            });
+        });
     </script>
 </body>
 </html>

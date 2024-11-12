@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Code Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .menu {
+            background-color: #252526;
+            padding: 20px;
+            width: 100%;
+            height: auto;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            cursor: pointer;
+        }
+        .menu-item i {
+            margin-right: 10px;
+        }
+        .menu-item:hover {
+            color: #ffffff;
+        }
+        .code-container {
+            padding: 20px;
+            width: 100%;
+        }
+        .tab {
+            cursor: pointer;
+            padding: 10px;
+            display: inline-block;
+        }
+        .tab.active {
+            border-bottom: 2px solid white;
+            color: white;
+        }
+        .tab.inactive {
+            color: #858585;
+        }
+        .terminal {
+            background-color: #1a1a1a;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            height: 200px;
+            overflow-y: auto;
+            border-radius: 5px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .terminal-output {
+            white-space: pre-line;
+        }
+        .prompt {
+            color: #7f8c8d;
+        }
+        .command {
+            color: #d4d4d4;
+        }
+        .success {
+            color: #6ab04c;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .directory {
+            color: #3498db;
+        }
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        @media (min-width: 768px) {
+            .menu {
+                width: 250px;
+                height: 100vh;
+            }
+            .code-container {
+                width: calc(100% - 250px);
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/go/go.min.js"></script>
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll(".tab").forEach(element => element.classList.remove("active"));
+            tab.classList.add("active");
+            const content = tab.getAttribute("data-content");
+            editor.setValue(content || "");
+        }
+
+        var editor;
+        document.addEventListener("DOMContentLoaded", () => {
+            editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+                mode: 'go',
+                theme: 'dracula',
+                lineNumbers: true,
+                lineWrapping: true,
+                readOnly: false,
+                scrollbarStyle: "null",
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete"
+                }
+            });
+
+            editor.getWrapperElement().style.height = '200px';
+
+            editor.on("change", function() {
+                var height = editor.getDoc().height * 1.2;
+                if (height < 200) height = 200;
+                editor.getWrapperElement().style.height = height + "px";
+            });
+        });
+
+        function addTerminalOutput() {
+            const terminal = document.getElementById("terminal");
+            const output = document.createElement("div");
+            output.className = "terminal-output";
+            output.innerHTML = `<span class="prompt">user@DESKTOP-GJE42DD:~$</span> <span class="command">go run main.go</span>
+<span class="success">Program executed successfully</span>
+<span class="directory">path/to/directory</span>`;
+            terminal.appendChild(output);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    </script>
+</head>
+<body>
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <div id="menu" class="menu">
+            <div class="menu-item">
+                <i class="fas fa-upload"></i>
+                <span>test  exercise</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-play"></i>
+                <span>Run exercise</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-sync-alt"></i>
+                <span>Pull latest func.go</span>
+            </div>
+            <!-- Clear Terminal Button -->
+            <div class="menu-item">
+                <i class="fas fa-trash"></i>
+                <span id="clearTerminal" class="cursor-pointer">Clear Terminal</span>
+            </div>
+        </div>
+    
+        <!-- Code Editor -->
+        <div id="codeContainer" class="code-container">
+            <div class="flex space-x-4 mb-4">
+                <span class="tab active" data-content="" onclick="switchTab(this)">main.go</span>
+                <span class="tab inactive" data-content="" onclick="switchTab(this)">func.go</span>
+                <!-- New tab to toggle sidebar -->
+                <span class="tab toggle-sidebar" onclick="toggleSidebar()">Toggle Sidebar</span>
+            </div>
+            <textarea id="codeEditor" class="code-content bg-transparent border-none focus:outline-none w-full h-full" placeholder="Write your code here..."></textarea>
+            <div class="mt-4 text-gray-400">
+                <span>Args:</span>
+                <input type="text" class="bg-transparent border-b border-gray-600 focus:outline-none focus:border-gray-400" placeholder="Program arguments">
+            </div>
+    
+            <!-- Terminal Output Section -->
+            <div id="terminal" class="terminal bg-black text-gray-200 p-4 rounded-md mt-4 text-sm font-mono overflow-y-auto h-48">
+                <div id="terminal-output" class="space-y-1">
+                    <!-- Output will appear here -->
+                </div>
+            </div>
+    
+            <script>
+                
+    
+            
+                // Clear terminal button functionality
+                document.getElementById("clearTerminal").addEventListener("click", () => {
+                    const terminalOutput = document.getElementById('terminal-output');
+                    terminalOutput.innerHTML = ''; // Clear the terminal
+                });
+    
+                // Function to toggle sidebar visibility
+                function toggleSidebar() {
+                    const menu = document.getElementById("menu");
+                    const codeContainer = document.getElementById("codeContainer");
+                    if (menu.style.display === "none") {
+                        menu.style.display = "block"; // Show sidebar
+                        codeContainer.style.flexGrow = "1"; // Allow code editor to take full space
+                    } else {
+                        menu.style.display = "none"; // Hide sidebar
+                        codeContainer.style.flexGrow = "10"; // Expand code editor to full size
+                    }
+                }
+            </script>
+        </div>
+    </div>
+    </body>
+    </html>
+    

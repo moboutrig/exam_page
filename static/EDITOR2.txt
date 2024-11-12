@@ -84,13 +84,13 @@
         }
 
         .CodeMirror-selected {
-        background-color: #4e9fd2 !important; /* A distinct blue for selection */
-    }
+            background-color: #4e9fd2 !important; /* A distinct blue for selection */
+        }
 
-    /* Ensure terminal selection is distinguishable */
-    .xterm .xterm-selection {
-        background-color: #4e9fd2 !important; /* Matching blue for terminal selection */
-    }
+        /* Ensure terminal selection is distinguishable */
+        .xterm .xterm-selection {
+            background-color: #4e9fd2 !important; /* Matching blue for terminal selection */
+        }
 
         .tab-label {
             padding: 8px 16px;
@@ -190,6 +190,38 @@
         .btn-clear:hover {
             background: #ff3333;
         }
+
+        .args-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #44475a;
+            color: #f8f8f2;
+        }
+
+        .args-input::placeholder {
+            color: #6272a4;
+        }
+
+
+ .terminal-content {
+    background: #282a36;
+    border-radius: 0 0 8px 8px;
+    padding: 10px;
+    height: 360px;
+    overflow-x: auto; /* Enables horizontal scroll */
+    overflow-y: auto; /* Enables vertical scroll */
+    white-space: pre-wrap; /* Preserve line breaks */
+    word-wrap: break-word; /* Preserve line breaks */
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+
     </style>
 </head>
 <body>
@@ -216,20 +248,25 @@
                 <!-- Form for submitting the code -->
                 <form id="codeForm">
                     <div class="editor-footer">
-                        <button type="submit" class="btn btn-run">
+                        <input type="text" id="args" class="args-input" placeholder="Enter arguments here...">
+                        
+                        <!-- Run Button -->
+                        <button type="submit" class="btn btn-run" onclick="runCode(event)">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                 <path d="M4 2v12l10-6L4 2z"/>
                             </svg>
                             run 
                         </button>
-                        <button type="submit" class="btn btn-run">
+                        
+                        <!-- Push & Test Button -->
+                        <button class="btn btn-push" onclick="testCode(event)">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M4 2v12l10-6L4 2z"/>
+                                <path d="M8 2.5l4 4h-3v7H7v-7H4l4-4z"/>
                             </svg>
-                            test 
+                            Push & test 
                         </button>
                     </div>
-                </form>
+                </form>                
             </div>
         </div>
         
@@ -355,7 +392,6 @@ func main() {
             }
         }
 
-       
         // Save editor content to localStorage on change
         mainEditor.on('change', function () {
             saveEditorContent(mainEditor, 'mainEditorContent');
@@ -365,20 +401,50 @@ func main() {
             saveEditorContent(funcEditor, 'funcEditorContent');
         });
 
-        document.getElementById('codeForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const mainCode = mainEditor.getValue();
-            const funcCode = funcEditor.getValue();
-            const response = await fetch('/compile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({ main: mainCode, func: funcCode })
-            });
-            const result = await response.text();
-            document.getElementById('terminal').textContent = result;
-        };
+   // Run Code functionality
+async function runCode(e) {
+    e.preventDefault();
+    const mainCode = mainEditor.getValue();
+    const funcCode = funcEditor.getValue();
+    const args = document.getElementById('args').value;
+    
+    const response = await fetch('/compile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ main: mainCode, func: funcCode, args: args })
+    });
+
+    const result = await response.text();
+    term.writeln(result);
+}
+
+
+
+// Corrected testCode function
+async function testCode(e) {
+    e.preventDefault();
+
+    const funcCode = funcEditor.getValue();
+    const currentSubject = document.getElementById('currentSubject').textContent; // Corrected to textContent
+
+    const response = await fetch('/test', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            subject: currentSubject,
+            func: funcCode
+        })
+    });
+
+    const result = await response.text();
+    term.writeln(result);
+}
+
+
 
 
         // Simulate push function for code execution
@@ -430,7 +496,4 @@ func main() {
         }
     </script>
 </body>
-
 </html>
-
-

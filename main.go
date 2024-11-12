@@ -109,26 +109,6 @@ func handleCompile(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(runOut.String()))
 }
 
-func main() {
-	// Serve static files (HTML, CSS, JS) from the "static" directory
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-
-	// Serve the main page (index.html) at the root path
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/index.html") // Ensure this points to your actual index.html
-	})
-
-	// Handle the compilation and execution of the Go code
-	http.HandleFunc("/compile", handleCompile)
-	http.HandleFunc("/test", handletest)
-	// Start the server
-	fmt.Println("Server started at http://localhost:3429")
-	err := http.ListenAndServe(":3429", nil)
-	if err != nil {
-		fmt.Printf("Error starting server: %v\n", err)
-	}
-}
-
 func handletest(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -137,11 +117,11 @@ func handletest(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve code and arguments from the form submission
 	funcCode := r.FormValue("func")
-    mainCode := r.FormValue("main")
+	mainCode := r.FormValue("main")
 	subject := r.FormValue("subject")
-   
-    fmt.Println( mainCode , subject , funcCode)
-    
+
+	fmt.Println(mainCode, subject, funcCode)
+
 	if strings.HasSuffix(subject, ".go") {
 		subject = subject[:len(subject)-3] // Remove ".go" from the subject name
 	}
@@ -171,21 +151,41 @@ func handletest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Run the test script with the subject as a parameter
-cmd := exec.Command("./test_one.sh", subject)
-cmd.Dir = "./go-tests" // Set working directory to go-tests folder
+	cmd := exec.Command("./test_one.sh", subject)
+	cmd.Dir = "./go-tests" // Set working directory to go-tests folder
 
-output, err := cmd.CombinedOutput()
-if err != nil {
-    // If there's an error, return the error output
-    w.WriteHeader(http.StatusInternalServerError) // Set the correct HTTP status
-    w.Write([]byte(fmt.Sprintf("%v\n%s", err, string(output))))
-    return
-}
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		// If there's an error, return the error output
+		w.WriteHeader(http.StatusInternalServerError) // Set the correct HTTP status
+		w.Write([]byte(fmt.Sprintf("%v\n%s", err, string(output))))
+		return
+	}
 
 	// If output is empty, return the correct solution message
 	if strings.TrimSpace(string(output)) == "" {
 		w.Write([]byte("Correct solution"))
 	} else {
 		w.Write(output) // Return the output from the script
+	}
+}
+
+func main() {
+	// Serve static files (HTML, CSS, JS) from the "static" directory
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	// Serve the main page (index.html) at the root path
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html") // Ensure this points to your actual index.html
+	})
+
+	// Handle the compilation and execution of the Go code
+	http.HandleFunc("/compile", handleCompile)
+	http.HandleFunc("/test", handletest)
+	// Start the server
+	fmt.Println("Server started at http://localhost:8302")
+	err := http.ListenAndServe(":8302", nil)
+	if err != nil {
+		fmt.Printf("Error starting server: %v\n", err)
 	}
 }

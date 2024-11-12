@@ -3,61 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>chepiont</title>
+    <title>Chepiont</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* Root variables for VS Code theme colors */
+        :root {
+            --background-color: #1e1e1e;
+            --sidebar-color: #252526;
+            --text-color: #d4d4d4;
+            --accent-color: #007acc;
+            --hover-color: #3e3e42;
+            --button-color: #333;
+            --button-hover-color: #444;
+            --border-color: #3c3c3c;
+        }
+
+        /* General body and container styles */
+        body {
+            margin: 0;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background-color: var(--sidebar-color);
+            color: var(--text-color);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            padding-top: 20px;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        /* Sidebar toggle and show button styles */
+        #toggle-btn,
+        #show-btn {
+            font-size: 1.5rem;
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            outline: none;
+        }
+        
+        #show-btn {
+            position: fixed;
+            top: 20px;
+            left: 10px;
+            display: none;
+            z-index: 1000;
+        }
+
+        /* Level selector and subject container styling */
+        .level-selector {
+            padding: 10px 20px;
+        }
+
+        .level-selector label {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .level-selector select {
+            width: 100%;
+            padding: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            outline: none;
+        }
+
+        .subject-container {
+            padding: 10px 20px;
+        }
+
+        .grid-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: var(--background-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .grid-item:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* Main content area styling */
+        .content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+            background-color: var(--background-color);
+            transition: margin-left 0.3s ease;
+        }
+
+        .content.full-width {
+            margin-left: 0;
+            width: 100%;
+        }
+    
+        iframe {
+            flex: 1;
+            border: none;
+            min-height: 2000px;
+            border-radius: 4px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            background: var(--background-color);
+        }
+        
+    </style>
 </head>
 <body>
+    <button id="show-btn" onclick="toggleSidebar()">☰</button> <!-- Show button -->
+
     <div class="container">
-        <div class="top-bar">
-            <h1>demo exam page</h1>
-        </div>
-
-        <div class="main-content">
-            <div id="sidebar" class="sidebar">
-                <div class="level-selector">
-                    <label for="level">Select Level:</label>
-                    <select id="level" onchange="displaySubjects()">
-                        <option value="1">Level 1</option>
-                        <option value="2">Level 2</option>
-                        <option value="3">Level 3</option>
-                        <option value="4">Level 4</option>
-                        <option value="5">Level 5</option>
-                        <option value="6">Level 6</option>
-                        <option value="7">Level 7</option>
-                        <option value="8">Level 8</option>
-                        <option value="9">Level 9</option>
-                        <option value="10">Level 10</option>
-                    </select>
-                </div>
-
-                <div id="subject-container" class="subject-container"></div>
+        <div id="sidebar" class="sidebar">
+            <button id="toggle-btn" onclick="toggleSidebar()">❌</button>
+            
+            <div class="level-selector">
+                <label for="level">Select Level:</label>
+                <select id="level" onchange="displaySubjects()">
+                    <option value="1">Level 1</option>
+                    <option value="2">Level 2</option>
+                    <option value="3">Level 3</option>
+                    <option value="4">Level 4</option>
+                    <option value="5">Level 5</option>
+                    <option value="6">Level 6</option>
+                    <option value="7">Level 7</option>
+                    <option value="8">Level 8</option>
+                    <option value="9">Level 9</option>
+                    <option value="10">Level 10</option>
+                </select>
             </div>
 
-            <button id="toggle-btn" class="toggle-btn" onclick="toggleSidebar()">❌</button>
+            <div id="subject-container" class="subject-container"></div>
+        </div>
 
-            <div class="content">
-                <div id="subject-content" class="iframe-content">
-                    <iframe id="content-frame" src="static/iframe.html" frameborder="0" width="100%" height="100%"></iframe>
-                </div>
+        <div class="content" id="main-content">
+            <div id="subject-content" class="iframe-content">
+                <iframe id="content-frame" src="static/iframe.html" frameborder="0" width="100%" height="100%"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-      const subjects = {
-        1: ["onlya", "onlyz"],
-        2: ["printalphabet", "printreversealphabet", "printdigits"],
-        3: ["strlen", "swap", "fishandchips", "countcharacter", "countalpha", "checknumber", "digitlen"],
-        4: ["atoi", "printcomb", "fromto", "capitalize", "itoa", "weareunique", "printrevcomb", "printmemory", "iscapitalized", "findprevprime", "thirdtimeisacharm"],
-        5: ["saveandmiss", "concatslice", "union", "inter", "fprime", "reversestrcap", "wdmatch"],
-        6: ["fifthandskip", "slice", "revconcatalternate", "notdecimal", "wordflip"],
-        7: ["split", "rostring", "printnbrbase", "splitwhitespaces"],
-        8: ["atoibase", "itoabase", "doop", "piglatin", "romannumbers", "options"],
-        9: ["rpncalc", "brackets", "sortedlistmerge"],
-        10: ["btreedeletenode", "grouping", "brainfuck"]
+        const subjects = {
+            1: ["onlya", "onlyz"],
+            2: ["printalphabet", "printreversealphabet", "printdigits"],
+            3: ["strlen", "swap", "fishandchips", "countcharacter", "countalpha", "checknumber", "digitlen"],
+            4: ["atoi", "printcomb", "fromto", "capitalize", "itoa", "weareunique", "printrevcomb", "printmemory", "iscapitalized", "findprevprime", "thirdtimeisacharm"],
+            5: ["saveandmiss", "concatslice", "union", "inter", "fprime", "reversestrcap", "wdmatch"],
+            6: ["fifthandskip", "slice", "revconcatalternate", "notdecimal", "wordflip"],
+            7: ["split", "rostring", "printnbrbase", "splitwhitespaces"],
+            8: ["atoibase", "itoabase", "doop", "piglatin", "romannumbers", "options"],
+            9: ["rpncalc", "brackets", "sortedlistmerge"],
+            10: ["btreedeletenode", "grouping", "brainfuck"]
         };
-
-
 
         function displaySubjects() {
             const level = document.getElementById("level").value;
@@ -70,8 +190,8 @@
                     subjectDiv.classList.add("grid-item");
                     subjectDiv.textContent = subject;
                     subjectDiv.onclick = () => {
-                        localStorage.setItem('selectedSubject', subject); // Store selected subject
-                        sendToIframe(subject); // Send subject to iframe
+                        localStorage.setItem('selectedSubject', subject);
+                        sendToIframe(subject);
                     };
                     subjectContainer.appendChild(subjectDiv);
                 });
@@ -82,46 +202,19 @@
             const iframeWindow = document.getElementById("content-frame").contentWindow;
             iframeWindow.postMessage({ subject }, "*");
         }
-  
-        function sendToIframe(subject) {
-            // Send the subject as a message to the iframe
-            const iframeWindow = document.getElementById("content-frame").contentWindow;
-            iframeWindow.postMessage({ subject }, "*");
-        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById("sidebar");
-            const toggleBtn = document.getElementById("toggle-btn");
-            const content = document.querySelector(".content");
+            const content = document.getElementById("main-content");
+            const showBtn = document.getElementById("show-btn");
 
             sidebar.classList.toggle("hidden");
+            content.classList.toggle("full-width");
 
-            if (sidebar.classList.contains("hidden")) {
-                toggleBtn.classList.remove("close");
-                toggleBtn.classList.add("open");
-                toggleBtn.textContent = "☰ ";
-                content.style.width = "100%";
-            } else {
-                toggleBtn.classList.remove("open");
-                toggleBtn.classList.add("close");
-                toggleBtn.textContent = "❌";
-                content.style.width = "80%";
-            }
+            showBtn.style.display = sidebar.classList.contains("hidden") ? "block" : "none";
         }
 
         window.onload = displaySubjects;
     </script>
 </body>
 </html>
-
-
-// "onlya", "onlyz"
-// "printalphabet", "printreversealphabet", "printdigits"
-// "strlen", "swap", "fishandchips", "countcharacter", "countalpha", "checknumber", "digitlen"
-// "atoi", "printcomb", "fromto", "capitalize", "itoa", "weareunique", "printrevcomb", "printmemory", "iscapitalized", "findprevprime", "thirdtimeisacharm"
-// "saveandmiss", "concatslice", "union", "inter", "fprime", "reversestrcap", "wdmatch"
-// "fifthandskip", "slice", "revconcatalternate", "notdecimal", "wordflip"
-// "split", "rostring", "printnbrbase", "splitwhitespaces"
-// "atoibase", "itoabase", "doop", "piglatin", "romannumbers", "options"
-// "rpncalc", "brackets", "sortedlistmerge"
-// "btreedeletenode", "grouping", "brainfuck"
