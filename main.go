@@ -126,8 +126,8 @@ func handletest(w http.ResponseWriter, r *http.Request) {
 		subject = subject[:len(subject)-3] // Remove ".go" from the subject name
 	}
 	// Define the paths for the subject files using the subject identifier
-	subjectFilePath := fmt.Sprintf("./go-tests/piscine-go/%s.go", subject)
-	mainFilePath := fmt.Sprintf("./go-tests/piscine-go/%s/main.go", subject)
+	subjectFilePath := fmt.Sprintf("./piscine-go/%s.go", subject)
+	mainFilePath := fmt.Sprintf("./piscine-go/%s/main.go", subject)
 	fmt.Println(subjectFilePath, mainFilePath)
 	// Check if main.go exists and use mainCode if so
 
