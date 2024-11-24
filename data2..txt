@@ -1,0 +1,198 @@
+
+
+Quest 1
+
+Exercices:
+
+    KEEP IT EMPTY  ARRAY 
+    
+    
+    
+    
+    
+     
+    
+
+
+
+
+
+
+Quest 2
+
+Exercices:
+
+    printalphabet 
+    printreversealphabet 
+    prindigits 
+    isnegative 
+    printcomb 
+    printcomb2 
+    printnbr 
+    printcombn 
+    
+Quest 3
+
+Exercices:
+
+    pointone 
+    ultimatepointone 
+    divmod 
+    ultimatedivmod 
+    printstr 
+    strlen 
+    swap 
+    strrev 
+    basicatoi 
+    basicatoi2 
+    atoi 
+    sortintegerable 
+    
+
+
+Quest 4
+
+Exercices:
+
+    iterativefactorial 
+    recursivefactorial 
+    iterativepower 
+    recursivepower 
+    fibonacci 
+    sqrt 
+    isprime 
+    findnextprime 
+    eightqueens 
+    
+Quest 5
+
+
+Exercices:
+
+    firstrune 
+    nrune 
+    lastrune 
+    index 
+    compare 
+    toupper 
+    tolower 
+    capitalize 
+    isalpha 
+    isnumeric 
+    islower 
+    isupper 
+    isprintable 
+    concat 
+    basicjoin 
+    join 
+    printnbrbase 
+    atoibase 
+    
+Quest 6
+
+Videos:
+
+    06-01-Os.Args | https://www.youtube.com/watch?v=I1xt_TLRhF0
+
+Exercices:
+
+    printprogramname 
+    printparams 
+    revparams 
+    sortparams 
+    
+
+Quest 7
+
+Exercices:
+
+    appendrange 
+    makerange 
+    concatparams 
+    splitwhitespaces 
+    printwordstables 
+    convertbase 
+    split 
+
+
+Quest 8
+
+Exercices:
+
+    bool 
+    point 
+    displayfile 
+    cat 
+    ztail 
+    
+
+
+Quest 9
+
+Exercices:
+
+    foreach 
+    map 
+    any 
+    countif 
+    issorted 
+    doop 
+    sortwordarr 
+    advancedsortwordarr 
+    
+Quest 10
+
+Exercices:
+
+    rot14 
+    abort 
+    collatzcountdown 
+    comcheck 
+    enigma 
+    pilot 
+    fixthemain 
+    compact 
+    activebits 
+    max 
+    join 
+    unmatch 
+    
+
+
+Quest 11
+
+
+Exercices:
+
+    listpushback 
+    listpushfront 
+    listsize 
+    listlast 
+    listclear 
+    listat 
+    listreverse 
+    listforeach 
+    listforeachif 
+    listfind 
+    listremoveif 
+    listmerge 
+    listsort 
+    sortlistinsert 
+    sortedlistmerge 
+    
+Quest 12
+
+Exercices:
+
+    btreeinsertdata 
+    btreeapplyinorder 
+    btreeapplypreorder 
+    btreesearchitem 
+    btreelevelcount 
+    btreeisbinary 
+    btreeapplylevel 
+    btreemax 
+    btreemin 
+    btreetransplant 
+    btreedeletenode 
+    

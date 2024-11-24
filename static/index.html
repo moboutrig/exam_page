@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chepiont</title>
+    <title>exam-page</title>
     <link rel="stylesheet" href="/static/styles.css">
     <style>
-        /* Root variables for VS Code theme colors */
+        /* Previous styles remain the same */
         :root {
             --background-color: #1e1e1e;
             --sidebar-color: #252526;
@@ -18,7 +18,6 @@
             --border-color: #3c3c3c;
         }
 
-        /* General body and container styles */
         body {
             margin: 0;
             font-family: Consolas, Monaco, "Courier New", monospace;
@@ -31,7 +30,6 @@
             height: 100vh;
         }
 
-        /* Sidebar styling */
         .sidebar {
             width: 250px;
             position: fixed;
@@ -52,7 +50,13 @@
             transform: translateX(-100%);
         }
 
-        /* Sidebar toggle and show button styles */
+        .selectors-container {
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         #toggle-btn,
         #show-btn {
             font-size: 1.5rem;
@@ -71,23 +75,21 @@
             z-index: 1000;
         }
 
-        /* Level selector and subject container styling */
-        .level-selector {
-            padding: 10px 20px;
-        }
-
-        .level-selector label {
+        .selectors-container label {
             font-weight: bold;
             color: var(--accent-color);
+            display: block;
+            margin-bottom: 5px;
         }
 
-        .level-selector select {
+        .selectors-container select {
             width: 100%;
             padding: 5px;
             background-color: var(--background-color);
             color: var(--text-color);
             border: 1px solid var(--border-color);
             outline: none;
+            margin-bottom: 10px;
         }
 
         .subject-container {
@@ -107,7 +109,6 @@
             background-color: var(--hover-color);
         }
 
-        /* Main content area styling */
         .content {
             margin-left: 250px;
             width: calc(100% - 250px);
@@ -129,30 +130,29 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
             background: var(--background-color);
         }
-        
     </style>
 </head>
 <body>
-    <button id="show-btn" onclick="toggleSidebar()">☰</button> <!-- Show button -->
+    <button id="show-btn" onclick="toggleSidebar()">☰</button>
 
     <div class="container">
         <div id="sidebar" class="sidebar">
             <button id="toggle-btn" onclick="toggleSidebar()">❌</button>
             
-            <div class="level-selector">
-                <label for="level">Select Level:</label>
-                <select id="level" onchange="displaySubjects()">
-                    <option value="1">Level 1</option>
-                    <option value="2">Level 2</option>
-                    <option value="3">Level 3</option>
-                    <option value="4">Level 4</option>
-                    <option value="5">Level 5</option>
-                    <option value="6">Level 6</option>
-                    <option value="7">Level 7</option>
-                    <option value="8">Level 8</option>
-                    <option value="9">Level 9</option>
-                    <option value="10">Level 10</option>
-                </select>
+            <div class="selectors-container">
+                <div>
+                    <label for="exam-type">Select Type:</label>
+                    <select id="exam-type" onchange="updateLevelOptions()">
+                        <option value="quests">Quests</option>
+                        <option value="checkpoint">Checkpoint</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="level">Select Level:</label>
+                    <select id="level" onchange="displaySubjects()">
+                    </select>
+                </div>
             </div>
 
             <div id="subject-container" class="subject-container"></div>
@@ -166,7 +166,22 @@
     </div>
 
     <script>
-        const subjects = {
+        const questsSubjects = {
+            1: [],
+            2: ["printalphabet", "printreversealphabet", "prindigits", "isnegative", "printcomb", "printcomb2", "printnbr", "printcombn"],
+            3: ["pointone", "ultimatepointone", "divmod", "ultimatedivmod", "printstr", "strlen", "swap", "strrev", "basicatoi", "basicatoi2", "atoi", "sortintegerable"],
+            4: ["iterativefactorial", "recursivefactorial", "iterativepower", "recursivepower", "fibonacci", "sqrt", "isprime", "findnextprime", "eightqueens"],
+            5: ["firstrune", "nrune", "lastrune", "index", "compare", "toupper", "tolower", "capitalize", "isalpha", "isnumeric", "islower", "isupper", "isprintable", "concat", "basicjoin", "join", "printnbrbase", "atoibase"],
+            6: ["printprogramname", "printparams", "revparams", "sortparams"],
+            7: ["appendrange", "makerange", "concatparams", "splitwhitespaces", "printwordstables", "convertbase", "split"],
+            8: ["bool", "point", "displayfile", "cat", "ztail"],
+            9: ["foreach", "map", "any", "countif", "issorted", "doop", "sortwordarr", "advancedsortwordarr"],
+            10: ["rot14", "abort", "collatzcountdown", "comcheck", "enigma", "pilot", "fixthemain", "compact", "activebits", "max", "join", "unmatch"],
+            11: ["listpushback", "listpushfront", "listsize", "listlast", "listclear", "listat", "listreverse", "listforeach", "listforeachif", "listfind", "listremoveif", "listmerge", "listsort", "sortlistinsert", "sortedlistmerge"],
+            12: ["btreeinsertdata", "btreeapplyinorder", "btreeapplypreorder", "btreesearchitem", "btreelevelcount", "btreeisbinary", "btreeapplylevel", "btreemax", "btreemin", "btreetransplant", "btreedeletenode"]
+        };
+
+        const checkpointSubjects = {
             1: ["onlya", "onlyz"],
             2: ["printalphabet", "printreversealphabet", "printdigits"],
             3: ["strlen", "swap", "fishandchips", "countcharacter", "countalpha", "checknumber", "digitlen"],
@@ -179,12 +194,36 @@
             10: ["btreedeletenode", "grouping", "brainfuck"]
         };
 
+        function updateLevelOptions() {
+            const examType = document.getElementById("exam-type").value;
+            const levelSelect = document.getElementById("level");
+            const subjects = examType === 'quests' ? questsSubjects : checkpointSubjects;
+            const maxLevel = Object.keys(subjects).length;
+            
+            // Clear existing options
+            levelSelect.innerHTML = '';
+            
+            // Add new options based on exam type
+            for (let i = 1; i <= maxLevel; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = `Level ${i}`;
+                levelSelect.appendChild(option);
+            }
+            
+            // Update subjects display
+            displaySubjects();
+        }
+
         function displaySubjects() {
+            const examType = document.getElementById("exam-type").value;
             const level = document.getElementById("level").value;
             const subjectContainer = document.getElementById("subject-container");
             subjectContainer.innerHTML = '';
 
-            if (level) {
+            const subjects = examType === 'quests' ? questsSubjects : checkpointSubjects;
+
+            if (subjects[level]) {
                 subjects[level].forEach((subject) => {
                     const subjectDiv = document.createElement("div");
                     subjectDiv.classList.add("grid-item");
@@ -214,7 +253,11 @@
             showBtn.style.display = sidebar.classList.contains("hidden") ? "block" : "none";
         }
 
-        window.onload = displaySubjects;
+        // Initialize the page
+        window.onload = function() {
+            updateLevelOptions();
+            displaySubjects();
+        };
     </script>
 </body>
 </html>
